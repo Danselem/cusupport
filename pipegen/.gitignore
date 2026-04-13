@@ -1,0 +1,29 @@
+.venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.ruff_cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+
+# Mac
+.DS_Store
+
+# Data / outputs
+*.csv
+*.parquet
+*.h5
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/

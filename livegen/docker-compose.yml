@@ -1,0 +1,46 @@
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    environment:
+      LIVEKIT_KEYS: "dev: secret"
+    command: --dev --bind 0.0.0.0 --node-ip 127.0.0.1
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      LIVEKIT_URL: "http://livekit:7880"
+      LIVEKIT_API_KEY: "dev"
+      LIVEKIT_API_SECRET: "secret"
+    depends_on:
+      livekit:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./webembed
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      LIVEKIT_URL: "ws://livekit:7880"
+      NEXT_PUBLIC_LIVEKIT_URL: "ws://localhost:7880"
+      LIVEKIT_API_KEY: "dev"
+      LIVEKIT_API_SECRET: "secret"
+    depends_on:
+      - livekit
+      - agent
+    restart: unless-stopped

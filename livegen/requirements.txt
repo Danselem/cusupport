@@ -1,0 +1,4 @@
+livekit-agents[silero,google,nvidia,turn-detector]
+livekit-plugins-noise-cancellation
+python-dotenv
+flask

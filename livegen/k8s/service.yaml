@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: livekit-agent
+  labels:
+    app: livekit-agent
+spec:
+  type: ClusterIP
+  ports:
+    - port: 50931
+      targetPort: 50931
+      protocol: TCP
+      name: http
+  selector:
+    app: livekit-agent
