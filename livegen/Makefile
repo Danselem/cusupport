@@ -62,7 +62,7 @@ frontend:
 
 agent:
 	@echo "Starting u-turn..."
-	uv run -m src.agent dev
+	uv run -m src.agent dev &
 
 agent-console: ## Run agent in console mode (for testing voice input)
 	@echo "Starting agent in console mode..."

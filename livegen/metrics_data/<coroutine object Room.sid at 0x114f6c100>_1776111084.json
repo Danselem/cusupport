@@ -1,0 +1,19 @@
+{
+  "session_id": "<coroutine object Room.sid at 0x114f6c100>",
+  "call_start": 1776111084.915433,
+  "call_end": 1776111101.4084558,
+  "duration": 16.493022918701172,
+  "total_turns": 0,
+  "interruptions": 0,
+  "error_count": 0,
+  "collected_info": {
+    "phone": null,
+    "extension": null,
+    "intent": null,
+    "email": null,
+    "account_number": null
+  },
+  "service_type": "support",
+  "success": true,
+  "end_reason": "completed"
+}

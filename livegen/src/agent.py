@@ -67,14 +67,19 @@ class BPOServiceAgent(Agent):
         self._service_type = service_type
 
         if service_type == "sales":
-            instructions = SYSTEM_PROMPT + "\n" + SalesPrompts.INSTRUCTIONS
+            base_instructions = SYSTEM_PROMPT + "\n" + SalesPrompts.INSTRUCTIONS
             greeting = SalesPrompts.GREETING
         elif service_type == "retention":
-            instructions = SYSTEM_PROMPT + "\n" + RetentionPrompts.INSTRUCTIONS
+            base_instructions = SYSTEM_PROMPT + "\n" + RetentionPrompts.INSTRUCTIONS
             greeting = RetentionPrompts.GREETING
         else:
-            instructions = SYSTEM_PROMPT
+            base_instructions = SYSTEM_PROMPT
             greeting = GREETING
+
+        instructions = f"""## Opening Greeting (Required)
+When the call starts, say exactly: "{greeting}"
+
+{base_instructions}"""
 
         super().__init__(instructions=instructions)
         self._greeting = greeting
@@ -100,12 +105,14 @@ async def bpo_entrypoint(ctx: agents.JobContext):
 
     logger.info(f"Starting {service_type} session: {room_sid}")
 
+    agent = BPOServiceAgent(room_sid=room_sid, service_type=service_type)
+
     llm = None
     try:
         llm = google.realtime.RealtimeModel(
             model="gemini-2.5-flash-native-audio-preview-12-2025",
-            voice="Puck",
-            instructions=SYSTEM_PROMPT,
+            voice="Vindemiatrix",
+            instructions=agent.instructions,
             enable_affective_dialog=True,
         )
         logger.info(f"LLM initialized with model: {llm.model}")
@@ -120,7 +127,6 @@ async def bpo_entrypoint(ctx: agents.JobContext):
         logger.error(f"Failed to create session: {e}")
         return
 
-    agent = BPOServiceAgent(room_sid=room_sid, service_type=service_type)
     metrics = CallMetrics(
         session_id=room_sid,
         call_start=call_start,
@@ -132,8 +138,13 @@ async def bpo_entrypoint(ctx: agents.JobContext):
         logger.info("Session started successfully")
 
         greeting = agent._greeting
-        await session.generate_reply(instructions=f"Say exactly: {greeting}")
-        logger.info(f"Sent greeting: {greeting}")
+        logger.info(f"Calling generate_reply with greeting: {greeting}")
+
+        await asyncio.sleep(0.5)
+        await session.generate_reply(
+            instructions=f"Greet the user by saying exactly: {greeting}"
+        )
+        logger.info("generate_reply completed")
 
         await asyncio.sleep(5)
 
